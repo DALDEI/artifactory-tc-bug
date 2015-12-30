@@ -20,6 +20,11 @@ buildscript {
   }
 }
 
+def javaProjects() {
+    subprojects.findAll { new File(it.projectDir, 'src').directory }
+} 
+
+
 allprojects {
   apply plugin: 'java'
   apply plugin: 'maven'
@@ -36,3 +41,45 @@ artifactoryPublish.skip = true
 task wrapper(type: Wrapper) {
   gradleVersion = '2.4'
 }
+
+
+
+configure(javaProjects()) {
+    apply plugin: 'java'
+    apply plugin: 'maven-publish'
+    apply plugin: 'ivy-publish'
+
+    dependencies {
+        testCompile 'junit:junit:4.7'
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+                artifact(file("$rootDir/gradle.properties"))
+            }
+        }
+    }
+}
+
+project('api') {
+    apply plugin: 'ivy-publish'
+    apply plugin: 'maven-publish'
+
+    publishing {
+        publications {
+            ivyJava(IvyPublication) {
+                from components.java
+                artifact(file("$rootDir/settings.gradle")) {
+                    name "gradle-settings"
+                    extension "txt"
+                    type "text"
+                }
+               
+            }
+        }
+    }
+
+}
+
