@@ -27,7 +27,8 @@ def javaProjects() {
 
 allprojects {
   apply plugin: 'java'
-  apply plugin: 'maven'
+  apply plugin: 'maven-publish'
+  apply plugin: 'ivy-publish'
 
   group = 'org.jfrog.example.gradle'
   version = "${project.currentVersion}"
@@ -46,8 +47,7 @@ task wrapper(type: Wrapper) {
 
 configure(javaProjects()) {
     apply plugin: 'java'
-    apply plugin: 'maven-publish'
-    apply plugin: 'ivy-publish'
+
 
     dependencies {
         testCompile 'junit:junit:4.7'
@@ -64,8 +64,7 @@ configure(javaProjects()) {
 }
 
 project('api') {
-    apply plugin: 'ivy-publish'
-    apply plugin: 'maven-publish'
+
 
     publishing {
         publications {
