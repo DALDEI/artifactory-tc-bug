@@ -38,7 +38,9 @@ def javaProjects() {
 allprojects {
     repositories { jcenter() } 
     apply plugin: 'com.jfrog.artifactory'
+
     group = 'org.jfrog.test.gradle.publish'
+    
     version = currentVersion
     status = 'Integration'
 }
@@ -52,6 +54,7 @@ project('services') {
 configure(javaProjects()) {
     apply plugin: 'java'
     apply plugin: 'maven-publish'
+    apply plugin: 'ivy-publish'
 
     dependencies {
         testCompile 'junit:junit:4.7'
@@ -69,6 +72,7 @@ configure(javaProjects()) {
 
 project('api') {
     apply plugin: 'ivy-publish'
+    apply plugin: 'maven-plugin'
 
     publishing {
         publications {
