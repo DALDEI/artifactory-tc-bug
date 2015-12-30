@@ -72,7 +72,7 @@ configure(javaProjects()) {
 
 project('api') {
     apply plugin: 'ivy-publish'
-    apply plugin: 'maven-plugin'
+    apply plugin: 'maven-publish'
 
     publishing {
         publications {
