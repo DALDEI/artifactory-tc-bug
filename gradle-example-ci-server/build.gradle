@@ -34,13 +34,16 @@ allprojects {
   apply plugin: 'ivy-publish'
 
   group = 'org.jfrog.example.gradle'
-  if( ! project.hasProperty("buildRelease" ) ) {
+  if( ! project.hasProperty("buildRelease" ) ) 
     project.ext.set("verRelease" , "${-> project.verIntegrate}")
-    status = 'integration'
-  } else {
-  status = 'release'
-  }
-  version="${-> project.verRelease}"
+
+if( "${->project.verRelease}".endsWith( "SNAPSHOT" ) )
+      project.ext.set("verStatus"  , "integration" )
+else
+     project.ext.set("verStatus" , "release")
+version "${-> project.verRelease}"
+status "${-> project.verStatus }"
+   println "verRelease: ${-> project.verRelease} verStatus: ${-> project.verStatus}"
 }
 
 // Setting this property to true will make the artifactoryPublish task
