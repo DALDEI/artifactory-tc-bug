@@ -41,7 +41,6 @@ allprojects {
   version="${-> project.verRelease}"
   status = 'release'
   }
- # version = "${project.currentVersion}"
 }
 
 // Setting this property to true will make the artifactoryPublish task
