@@ -26,21 +26,31 @@ def javaProjects() {
 
 
 allprojects {
+  repositories { 
+    jcenter() 
+  }
   apply plugin: 'java'
   apply plugin: 'maven-publish'
   apply plugin: 'ivy-publish'
 
   group = 'org.jfrog.example.gradle'
-  version = "${project.currentVersion}"
-  status = 'integration'
+  if( ! project.hasProperty("buildRelease" ) ) {
+    project.ext.set("verRelease" , "${-> project.verIntegrate}")
+    status = 'integration'
+  } else {
+  version="${-> project.verRelease}"
+  status = 'release'
+  }
+ # version = "${project.currentVersion}"
 }
 
 // Setting this property to true will make the artifactoryPublish task
 // skip this module (in our case, the root module):
+// HOW TO CALL THIS CONDITIONQLLY ??
 artifactoryPublish.skip = true
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '2.4'
+  gradleVersion = '2.11'
 }
 
 
