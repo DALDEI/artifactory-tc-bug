@@ -38,9 +38,9 @@ allprojects {
     project.ext.set("verRelease" , "${-> project.verIntegrate}")
     status = 'integration'
   } else {
-  version="${-> project.verRelease}"
   status = 'release'
   }
+  version="${-> project.verRelease}"
 }
 
 // Setting this property to true will make the artifactoryPublish task
