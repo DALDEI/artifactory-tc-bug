@@ -32,18 +32,9 @@ allprojects {
   apply plugin: 'java'
   apply plugin: 'maven-publish'
   apply plugin: 'ivy-publish'
-
-  group = 'org.jfrog.example.gradle'
-  if( ! project.hasProperty("buildRelease" ) ) 
-    project.ext.set("verRelease" , "${-> project.verIntegrate}")
-
-if( "${->project.verRelease}".endsWith( "SNAPSHOT" ) )
-      project.ext.set("verStatus"  , "integration" )
-else
-     project.ext.set("verStatus" , "release")
-version "${-> project.verRelease}"
-status "${-> project.verStatus }"
-   println "verRelease: ${-> project.verRelease} verStatus: ${-> project.verStatus}"
+  version currentVersion
+  group = 'org.jfrog.example.gradle2'
+  println "version: ${-> project.version} status: ${-> project.status}"
 }
 
 // Setting this property to true will make the artifactoryPublish task
