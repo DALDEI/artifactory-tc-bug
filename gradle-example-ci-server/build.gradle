@@ -49,9 +49,12 @@ status "${-> project.verStatus }"
 // Setting this property to true will make the artifactoryPublish task
 // skip this module (in our case, the root module):
 // HOW TO CALL THIS CONDITIONQLLY ??
-artifactoryPublish.skip = true
-
-task wrapper(type: Wrapper) {
+gradle.taskGraph.whenReady { taskGraph ->
+  if( taskGraph.hasTask("artifactoryPublish") )
+      rootProject.tasks["artifactoryPublish"].setProperty("skip",true)
+}
+  
+task wrapper(type: Wrapper) { 
   gradleVersion = '2.11'
 }
 
