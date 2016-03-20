@@ -42,10 +42,11 @@ allprojects {
 // HOW TO CALL THIS CONDITIONQLLY ??
 afterEvaluate  { p ->
   println "##teamcity[blockOpened name='taskGraph' desscription='Task graph ready']"
-  if( p.tasks.findByPath(":artifactoryPublish") != null ) {
+  Task t = p.tasks.findByPath(":artifactoryPublish") 
+  if( t != null ){
       println "##teamcity[message text='HAS artifactoryPublish']"
       //rootProject.tasks["artifactoryPublish"].setProperty("skip",true)
-      p.setProperty("artifactoryPublish.skip","true")
+      t.setProperty("skip","true")
   } else
       println "##teamcity[message text='DOES NOT HAAVE artifactoryPublish']"
   println "##teamcity[blockClosed name='taskGraph']"
