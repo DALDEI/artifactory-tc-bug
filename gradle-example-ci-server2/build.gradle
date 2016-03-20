@@ -41,11 +41,14 @@ allprojects {
 // skip this module (in our case, the root module):
 // HOW TO CALL THIS CONDITIONQLLY ??
 gradle.taskGraph.whenReady { taskGraph ->
+  println "##teamcity[blockOpened name='taskGraph' desscription='Task graph ready']"
   if( taskGraph.hasTask("artifactoryPublish") ){
-      println "HAS artifactoryPublish"
+      println "##teamcity[message text='HAS artifactoryPublish']"
       //rootProject.tasks["artifactoryPublish"].setProperty("skip",true)
       rootProject.setProperty("artifactoryPublish.skip","true")
-  }
+  } else
+      println "##teamcity[message text='DOES NOT HAAVE artifactoryPublish']"
+  println "##teamcity[blockClosed name='taskGraph']"
 }
   
 task wrapper(type: Wrapper) { 
