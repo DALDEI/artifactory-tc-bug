@@ -26,9 +26,6 @@ def javaProjects() {
 
 
 allprojects {
-  repositories { 
-    jcenter() 
-  }
   apply plugin: 'java'
   apply plugin: 'maven-publish'
   apply plugin: 'ivy-publish'
@@ -47,8 +44,14 @@ afterEvaluate  { p ->
       println "##teamcity[message text='HAS artifactoryPublish']"
       //rootProject.tasks["artifactoryPublish"].setProperty("skip",true)
       t.setProperty("skip","true")
-  } else
+  } else {
       println "##teamcity[message text='DOES NOT HAAVE artifactoryPublish']"
+   rootProject.allprojects {
+     repositories { 
+      jcenter() 
+     }
+    }
+  }
   println "##teamcity[blockClosed name='taskGraph']"
 }
   
