@@ -1,0 +1,90 @@
+/*
+ * Copyright (C) 2013 JFrog Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+buildscript {
+  repositories {
+    jcenter()
+  }
+}
+
+def javaProjects() {
+    subprojects.findAll { new File(it.projectDir, 'src').directory }
+} 
+
+
+allprojects {
+  repositories { 
+    jcenter() 
+  }
+  apply plugin: 'java'
+  apply plugin: 'maven-publish'
+  apply plugin: 'ivy-publish'
+  version currentVersion
+  group = 'org.jfrog.example.gradle2'
+  println "version: ${-> project.version} status: ${-> project.status}"
+}
+
+// Setting this property to true will make the artifactoryPublish task
+// skip this module (in our case, the root module):
+// HOW TO CALL THIS CONDITIONQLLY ??
+gradle.taskGraph.whenReady { taskGraph ->
+  if( taskGraph.hasTask("artifactoryPublish") )
+      rootProject.tasks["artifactoryPublish"].setProperty("skip",true)
+}
+  
+task wrapper(type: Wrapper) { 
+  gradleVersion = '2.11'
+}
+
+
+
+configure(javaProjects()) {
+    apply plugin: 'java'
+
+
+    dependencies {
+        testCompile 'junit:junit:4.7'
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+                artifact(file("$rootDir/gradle.properties"))
+            }
+        }
+    }
+}
+
+project('api') {
+
+
+    publishing {
+        publications {
+            ivyJava(IvyPublication) {
+                from components.java
+                artifact(file("$rootDir/settings.gradle")) {
+                    name "gradle-settings"
+                    extension "txt"
+                    type "text"
+                }
+               
+            }
+        }
+    }
+
+}
+
