@@ -42,7 +42,7 @@ allprojects {
 // HOW TO CALL THIS CONDITIONQLLY ??
 gradle.taskGraph.whenReady { taskGraph ->
   println "##teamcity[blockOpened name='taskGraph' desscription='Task graph ready']"
-  if( taskGraph.hasTask("artifactoryPublish") ){
+  if( taskGraph.hasTask(":artifactoryPublish") ){
       println "##teamcity[message text='HAS artifactoryPublish']"
       //rootProject.tasks["artifactoryPublish"].setProperty("skip",true)
       rootProject.setProperty("artifactoryPublish.skip","true")
