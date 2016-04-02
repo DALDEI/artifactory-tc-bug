@@ -53,13 +53,40 @@ afterEvaluate  { p ->
     }
   }
   println "##teamcity[blockClosed name='taskGraph']"
-}
-  
+} 
 task wrapper(type: Wrapper) { 
   gradleVersion = '2.11'
 }
+def esc( s )
+{
+   [ "'" : '|\'' , '(\\[nr|\\[\\]])' : '|$1' , '\\\\u' : '|0x' ].each { n,v  ->
+     s = s.replaceAll(n,v)
+   }
+   return "'$s'";
+}      
+def tcmessage( String name , String value )
+{ 
+   println "##teamcity[$name " + esc(value) + " ]"
+}
+def tcmessage( String name , Map nv )
+{
+   String s=''
+   nv.each { prop,value -> 
+     s+= prop 
+     s+= '=' 
+     s+= esc(value) 
+     s+= ' ' 
+   }
+   println "##teamcity[$name $s ]"
 
-
+}
+task tcprops( type: Task ) {
+  doLast {
+    tcmessage(  'progessMessage', "a message = currentVersion=${currentVersion}" )
+    // tcmessage(  'message' , [ text:'Exception Text' , errorDetails: 'stack trace' , status:'ERROR' ]  )
+    tcmessage(  'setParameter' , [ name: "testProperty" , value: currentVersion ] )
+ }
+}
 
 configure(javaProjects()) {
     apply plugin: 'java'
