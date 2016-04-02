@@ -153,6 +153,6 @@ task build(type: Task ) <<  {
 allprojects {
 build.finalizedBy { 
     def testProperty = project.hasProperty('testProperty') ? project.property('testProperty') : '<none>';
-    tcmessage(  'message' , [ text:"testProperty is $testProperty" ] )
+    tcMessage(  "testProperty is $testProperty" )
 }
 }
