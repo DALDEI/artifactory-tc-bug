@@ -64,11 +64,11 @@ def esc( s )
    }
    return "'$s'";
 }      
-def tcmessage( String name , String value )
+def tcService( String name , String value )
 { 
    println "##teamcity[$name " + esc(value) + "]"
 }
-def tcmessage( String name , Map nv )
+def tcService( String name , Map nv )
 {
    String s=''
    nv.each { prop,value -> 
@@ -78,18 +78,36 @@ def tcmessage( String name , Map nv )
      s+= esc(value) 
    }
    println "##teamcity[$name$s]"
+}
+def tcMessage( String msg ) {
+  tcService( "message" , [ text: msg ] )
+}
+
+def tcSet( String name, String value ){
+  tcService( "setParameter" , [ name: name , value: value ] )
+}
+
+def tcOpen( String msg ) {
+  tcService( "blockOpen" , [ name: msg ] )
+}
+
+def tcClose( String msg ) {
+  tcService( "blockClose" , [ name: msg ] )
+}
+def tcBuild( buildNum )  {
+  tcService( "buildNumber" , buildNum )
 
 }
 task tcprops( type: Task ) {
   doLast {
-    tcmessage( 'blockOpen' , [ name: 'dodaprops' ])
-    tcmessage( 'progressStart' , "progress!!!");
-    tcmessage(  'progessMessage', "1) a message = currentVersion=${currentVersion}" )
-    tcmessage(  'progessMessage', [ text: "2) a message = currentVersion=${currentVersion}" ] )
-    //tcmessage(  'message' , [ text:'Exception Text' , errorDetails: 'stack trace' , status:'ERROR' ]  )
-    tcmessage(  'setParameter' , [ name: "testProperty" , value: currentVersion ] )
-    tcmessage( 'progressFinish' , "progress!!!");
-    tcmessage( 'blockClosed' , [ name: 'dodaprops' ])
+    tcOpen 'settingBuild' 
+    def buildNum=project.getProperty("build.number")
+    tcMessage(  "a message = currentVersion=${currentVersion} buildNum=${buildNum}")
+    def newBuild="new-${buildNum}-${currentVersion}" 
+    tcMessage( "setting build to $newBuild" )
+    tcSet( "testProperty" , currentVersion  )
+    tcBuild( newBuild )
+    tcClose( 'settingBuild' )
  }
 }
 
