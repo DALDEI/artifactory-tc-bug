@@ -66,27 +66,30 @@ def esc( s )
 }      
 def tcmessage( String name , String value )
 { 
-   println "##teamcity[$name " + esc(value) + " ]"
+   println "##teamcity[$name " + esc(value) + "]"
 }
 def tcmessage( String name , Map nv )
 {
    String s=''
    nv.each { prop,value -> 
+     s+= ' ' 
      s+= prop 
      s+= '=' 
      s+= esc(value) 
-     s+= ' ' 
    }
-   println "##teamcity[$name $s ]"
+   println "##teamcity[$name$s]"
 
 }
 task tcprops( type: Task ) {
   doLast {
-    tcmessage( 'progressStart' , "starting");
-    tcmessage(  'progessMessage', "a message = currentVersion=${currentVersion}" )
+    tcmessage( 'blockOpen' , [ name: 'dodaprops' ])
+    tcmessage( 'progressStart' , "progress!!!");
+    tcmessage(  'progessMessage', "1) a message = currentVersion=${currentVersion}" )
+    tcmessage(  'progessMessage', [ text: "2) a message = currentVersion=${currentVersion}" ] )
     //tcmessage(  'message' , [ text:'Exception Text' , errorDetails: 'stack trace' , status:'ERROR' ]  )
     tcmessage(  'setParameter' , [ name: "testProperty" , value: currentVersion ] )
-    tcmessage( 'progressFinish' , "finishing");
+    tcmessage( 'progressFinish' , "progress!!!");
+    tcmessage( 'blockClosed' , [ name: 'dodaprops' ])
  }
 }
 
@@ -129,8 +132,9 @@ project('api') {
 task build(type: Task ) <<  {
    println "Building"
 }
-
+allprojects {
 build.finalizedBy { 
     def testProperty = project.hasProperty('testProperty') ? project.property('testProperty') : '<none>';
     tcmessage(  'message' , [ text:"testProperty is $testProperty" ] )
+}
 }
