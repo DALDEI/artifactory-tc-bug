@@ -38,14 +38,14 @@ allprojects {
 // skip this module (in our case, the root module):
 // HOW TO CALL THIS CONDITIONQLLY ??
 afterEvaluate  { p ->
-  println "##teamcity[blockOpened name='taskGraph' desscription='Task graph ready']"
+  println "##teamcity[blockOpened name='taskGraph' description='Task graph ready']"
   Task t = p.tasks.findByPath(":artifactoryPublish") 
   if( t != null ){
       println "##teamcity[message text='HAS artifactoryPublish']"
       //rootProject.tasks["artifactoryPublish"].setProperty("skip",true)
       t.setProperty("skip","true")
   } else {
-      println "##teamcity[message text='DOES NOT HAAVE artifactoryPublish']"
+      println "##teamcity[message text='DOES NOT HAVE artifactoryPublish']"
    rootProject.allprojects {
      repositories { 
       jcenter() 
@@ -87,12 +87,12 @@ def tcSet( String name, String value ){
   tcService( "setParameter" , [ name: name , value: value ] )
 }
 
-def tcOpen( String msg ) {
-  tcService( "blockOpen" , [ name: msg ] )
+def tcOpen( String msg , desc="" ) {
+  tcService( "blockOpened" , [ name: msg , description: desc?: msg] )
 }
 
 def tcClose( String msg ) {
-  tcService( "blockClose" , [ name: msg ] )
+  tcService( "blockClosed" , [ name: msg ] )
 }
 def tcBuild( buildNum )  {
   tcService( "buildNumber" , buildNum )
@@ -152,7 +152,7 @@ task build(type: Task ) <<  {
 }
 allprojects {
 build.finalizedBy { 
-    def testProperty = project.hasProperty('testProperty') ? project.property('testProperty') : '<none>';
-    tcMessage(  "testProperty is $testProperty" )
+    def testProperty = project.hasProperty('build.number') ? project.property('build.number') : '<none>';
+    tcMessage(  "buildNumber is $testProperty" )
 }
 }
