@@ -82,9 +82,11 @@ def tcmessage( String name , Map nv )
 }
 task tcprops( type: Task ) {
   doLast {
+    tcmessage( 'progressStart' , "starting");
     tcmessage(  'progessMessage', "a message = currentVersion=${currentVersion}" )
-    // tcmessage(  'message' , [ text:'Exception Text' , errorDetails: 'stack trace' , status:'ERROR' ]  )
+    //tcmessage(  'message' , [ text:'Exception Text' , errorDetails: 'stack trace' , status:'ERROR' ]  )
     tcmessage(  'setParameter' , [ name: "testProperty" , value: currentVersion ] )
+    tcmessage( 'progressFinish' , "finishing");
  }
 }
 
@@ -124,4 +126,7 @@ project('api') {
     }
 
 }
-
+build.finalizedBy { 
+    def testProperty = project.hasProperty('testProperty') ? project.property('testProperty') : '<none>';
+    tcmessage(  'message' , [ text:"testProperty is $testProperty" ] )
+}
