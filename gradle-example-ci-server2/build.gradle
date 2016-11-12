@@ -106,6 +106,7 @@ task tcprops( type: Task ) {
     def newBuild="${buildNum}-${currentVersion}" 
     tcMessage( "setting build to $newBuild" )
     tcSet( "testProperty" , currentVersion  )
+    tcSet( "project.${project.name}.version" , project.version  )
     tcBuild( newBuild )
     tcClose( 'settingBuild' )
  }
