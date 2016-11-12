@@ -147,9 +147,6 @@ project('api') {
     }
 
 }
-task build(type: Task ) <<  {
-   println "Building"
-}
 allprojects {
 build.finalizedBy { 
     def testProperty = project.hasProperty('build.number') ? project.property('build.number') : '<none>';
