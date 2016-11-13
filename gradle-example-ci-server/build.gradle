@@ -34,14 +34,16 @@ allprojects {
   apply plugin: 'ivy-publish'
 
   group = 'org.jfrog.example.gradle'
+/*
   if( ! project.hasProperty("buildRelease" ) ) 
-    project.ext.set("verRelease" , "${-> project.verIntegrate}")
+    project.ext.set("currentVersion" , "${-> project.verIntegrate}")
+*/
 
-if( "${->project.verRelease}".endsWith( "SNAPSHOT" ) )
+if( "${->project.currentVersion}".endsWith( "SNAPSHOT" ) )
       project.ext.set("verStatus"  , "integration" )
 else
      project.ext.set("verStatus" , "release")
-version "${-> project.verRelease}"
+version "${-> project.currentVersion}"
 status "${-> project.verStatus }"
    println "verRelease: ${-> project.verRelease} verStatus: ${-> project.verStatus}"
 }
