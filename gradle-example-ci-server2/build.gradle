@@ -20,16 +20,20 @@ buildscript {
   }
 }
 
+plugins {
+    id "com.zoltu.git-versioning" version "2.0.30"
+}
+
 def javaProjects() {
     subprojects.findAll { new File(it.projectDir, 'src').directory }
 } 
-
-
+subprojects {
+  version "${->rootProject.version}"
+}
 allprojects {
   apply plugin: 'java'
   apply plugin: 'maven-publish'
   apply plugin: 'ivy-publish'
-  version currentVersion
   group = 'org.jfrog.example.gradle2'
   println "version: ${-> project.version} status: ${-> project.status}"
 }
@@ -101,12 +105,11 @@ def tcBuild( buildNum )  {
 task tcprops( type: Task ) {
   doLast {
     tcOpen 'settingBuild' 
-    def buildNum=project.getProperty("build.number")
-    tcMessage(  "a message = currentVersion=${currentVersion} buildNum=${buildNum}")
-    def newBuild="${currentVersion}-${buildNum}" 
+    tcMessage(  "a message = version=${version} project.version = ${project.version}" )
+    def newBuild="${project.version}"
     tcMessage( "setting build to $newBuild" )
     tcSet( "testProperty" , currentVersion  )
-    tcSet( "project.${project.name}.version" , project.version  )
+    //tcSet( "project.${project.name}.version" , "${project.version}"  )
     tcBuild( newBuild )
     tcClose( 'settingBuild' )
  }
