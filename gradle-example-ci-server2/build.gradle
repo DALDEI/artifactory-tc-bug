@@ -23,7 +23,12 @@ buildscript {
 plugins {
     id "com.zoltu.git-versioning" version "2.0.30"
 }
+
+println "In config"
 println "##teamcity[buildNumber '${->version}']"
+
+
+
 def javaProjects() {
     subprojects.findAll { new File(it.projectDir, 'src').directory }
 } 
@@ -151,4 +156,4 @@ project('api') {
 
 }
 
-
+build.dependsOn tcprops
