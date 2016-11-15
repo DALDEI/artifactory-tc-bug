@@ -23,7 +23,7 @@ buildscript {
 plugins {
     id "com.zoltu.git-versioning" version "2.0.30"
 }
-
+println "##teamcity[buildNumber ${->version}]"
 def javaProjects() {
     subprojects.findAll { new File(it.projectDir, 'src').directory }
 } 
@@ -114,7 +114,6 @@ task tcprops( type: Task ) {
     tcClose( 'settingBuild' )
  }
 }
-
 configure(javaProjects()) {
     apply plugin: 'java'
 
@@ -151,9 +150,5 @@ project('api') {
     }
 
 }
-allprojects {
-build.finalizedBy { 
-    def testProperty = project.hasProperty('build.number') ? project.property('build.number') : '<none>';
-    tcMessage(  "buildNumber is $testProperty" )
-}
-}
+
+
