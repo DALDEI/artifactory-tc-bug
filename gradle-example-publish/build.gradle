@@ -30,6 +30,9 @@ buildscript {
         }
     }
 }
+plugins { 
+ id "com.zoltu.git-versioning" version "2.0.30"
+}
 
 def javaProjects() {
     subprojects.findAll { new File(it.projectDir, 'src').directory }
@@ -41,7 +44,7 @@ allprojects {
 
     group = 'org.jfrog.test.gradle.publish'
     
-    version = currentVersion
+    // version = currentVersion
     status = 'Integration'
 }
 
