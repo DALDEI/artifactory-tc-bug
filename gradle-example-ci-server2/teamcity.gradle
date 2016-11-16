@@ -1,0 +1,79 @@
+
+def esc( s )
+{
+   [ "'" : '|\'' , '(\\[nr|\\[\\]])' : '|$1' , '\\\\u' : '|0x' ].each { n,v  ->
+     s = s.replaceAll(n,v)
+   }
+   return "'$s'";
+}      
+def tcService( String name , String value )
+{ 
+   println "##teamcity[$name " + esc(value) + "]"
+}
+def tcService( String name , Map nv )
+{
+   String s=''
+   nv.each { prop,value -> 
+     s+= ' ' 
+     s+= prop 
+     s+= '=' 
+     s+= esc(value) 
+   }
+   println "##teamcity[$name$s]"
+}
+ext.tcMessage = { String msg ->  
+  tcService( "message" , [ text: msg ] )
+}
+
+def tcSet( String name, String value ){
+  tcService( "setParameter" , [ name: name , value: value ] )
+}
+
+ext.tcOpen = { String msg , String desc  -> 
+  tcService( "blockOpened" , [ name: msg , description: desc?: msg] )
+}
+
+ext.tcClose  = { String msg ->
+  tcService( "blockClosed" , [ name: msg ] )
+}
+def tcBuild( buildNum )  {
+  tcService( "buildNumber" , buildNum )
+
+}
+
+def getProp( String prop , String defValue)
+{
+  if( rootProject.hasProperty(prop) )
+      rootProject.getProperty(prop)
+  else 
+  defValue
+
+}
+task setBuildNumber( type: Task ) {
+  ext {
+    buildPrefix = getProp("buildPrefix","")
+            
+    buildSuffix = getProp("buildSuffix","")
+   // version = rootProject.version
+    buildNumber = getProp("buildNumber",null)
+  }
+  doLast {
+    tcOpen 'setBuildNumber' , "Setting dynamic build number"
+    def bn = buildNumber?: "${buildPrefix}${version}${buildSuffix}"
+    tcMessage( "setting buildNumber: $bn version: $version" )
+    tcSet 'version',version
+    tcSet 'buildNumber', bn
+    tcBuild bn
+    tcClose 'setBuildNumber' 
+ }
+}
+
+allprojects {
+   afterEvaluate  { p ->  
+   println "After eval: ${p.name} version: $version"
+  if( p.hasProperty("buildVersion") ){
+     p.version = project.getProperty("buildVersion")
+     println "   -> setversion to ${version}"
+  }
+}
+}

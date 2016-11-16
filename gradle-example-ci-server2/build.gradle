@@ -24,105 +24,18 @@ plugins {
     id "com.zoltu.git-versioning" version "2.0.30"
 }
 
-println "In config"
-println "##teamcity[buildNumber '${->version}']"
-
-
-
-def javaProjects() {
-    subprojects.findAll { new File(it.projectDir, 'src').directory }
-} 
-subprojects {
-  version "${->rootProject.version}"
-}
+apply from: 'teamcity.gradle'
 allprojects {
+ group = 'org.jfrog.example.gradle2'
+repositories { jcenter() }
+}
+subprojects {
+  apply plugin: "com.zoltu.git-versioning"
   apply plugin: 'java'
   apply plugin: 'maven-publish'
   apply plugin: 'ivy-publish'
-  group = 'org.jfrog.example.gradle2'
-  println "version: ${-> project.version} status: ${-> project.status}"
-}
-
-// Setting this property to true will make the artifactoryPublish task
-// skip this module (in our case, the root module):
-// HOW TO CALL THIS CONDITIONQLLY ??
-afterEvaluate  { p ->
-  println "##teamcity[blockOpened name='taskGraph' description='Task graph ready']"
-  Task t = p.tasks.findByPath(":artifactoryPublish") 
-  if( t != null ){
-      println "##teamcity[message text='HAS artifactoryPublish']"
-      //rootProject.tasks["artifactoryPublish"].setProperty("skip",true)
-      t.setProperty("skip","true")
-  } else {
-      println "##teamcity[message text='DOES NOT HAVE artifactoryPublish']"
-   rootProject.allprojects {
-     repositories { 
-      jcenter() 
-     }
-    }
-  }
-  println "##teamcity[blockClosed name='taskGraph']"
-} 
-task wrapper(type: Wrapper) { 
-  gradleVersion = '2.11'
-}
-def esc( s )
-{
-   [ "'" : '|\'' , '(\\[nr|\\[\\]])' : '|$1' , '\\\\u' : '|0x' ].each { n,v  ->
-     s = s.replaceAll(n,v)
-   }
-   return "'$s'";
-}      
-def tcService( String name , String value )
-{ 
-   println "##teamcity[$name " + esc(value) + "]"
-}
-def tcService( String name , Map nv )
-{
-   String s=''
-   nv.each { prop,value -> 
-     s+= ' ' 
-     s+= prop 
-     s+= '=' 
-     s+= esc(value) 
-   }
-   println "##teamcity[$name$s]"
-}
-def tcMessage( String msg ) {
-  tcService( "message" , [ text: msg ] )
-}
-
-def tcSet( String name, String value ){
-  tcService( "setParameter" , [ name: name , value: value ] )
-}
-
-def tcOpen( String msg , desc="" ) {
-  tcService( "blockOpened" , [ name: msg , description: desc?: msg] )
-}
-
-def tcClose( String msg ) {
-  tcService( "blockClosed" , [ name: msg ] )
-}
-def tcBuild( buildNum )  {
-  tcService( "buildNumber" , buildNum )
-
-}
-task tcprops( type: Task ) {
-  doLast {
-    tcOpen 'settingBuild' 
-    tcMessage(  "a message = version=${version} project.version = ${project.version}" )
-    def newBuild="${project.version}"
-    tcMessage( "setting build to $newBuild" )
-    tcSet( "testProperty" , currentVersion  )
-    //tcSet( "project.${project.name}.version" , "${project.version}"  )
-    tcBuild( newBuild )
-    tcClose( 'settingBuild' )
- }
-}
-configure(javaProjects()) {
-    apply plugin: 'java'
-
-
+  println "project: ${project.name} version: ${-> project.version} status: ${-> project.status}"
+  
     dependencies {
         testCompile 'junit:junit:4.7'
     }
@@ -135,10 +48,27 @@ configure(javaProjects()) {
             }
         }
     }
+
 }
 
-project('api') {
+// Setting this property to true will make the artifactoryPublish task
+// skip this module (in our case, the root module):
+// HOW TO CALL THIS CONDITIONQLLY ??
 
+afterEvaluate  { p ->
+  tcOpen("checkArtifactory" , "Applying Artifactory if present")
+  Task t = p.tasks.findByPath(":artifactoryPublish") 
+  if( t != null ){
+     tcMessage 'HAS artifactoryPublish'
+      t.setProperty("skip","true")
+  } else {
+     tcMessage 'DOES NOT HAVE artifactoryPublish'
+  }
+  tcClose 'checkArtifactory'
+} 
+
+
+project('api') {
 
     publishing {
         publications {
@@ -156,4 +86,5 @@ project('api') {
 
 }
 
-build.dependsOn tcprops
+task build 
+build.finalizedBy tasks.setBuildNumber 
