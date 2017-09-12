@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<build-type xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" uuid="3fec6aeb-32a4-4349-978c-c49a173c9bb4" paused="true" xsi:noNamespaceSchemaLocation="http://www.jetbrains.com/teamcity/schemas/10.0/project-config.xsd">
+  <name>test-publish</name>
+  <description />
+  <settings>
+    <options>
+      <option name="allowExternalStatus" value="true" />
+      <option name="artifactRules" value="gradle-example-ci-server/**/build/libs/*.jar" />
+      <option name="buildNumberPattern" value="%dep.Test_TestBuildnumber.build.number%" />
+      <option name="checkoutMode" value="ON_AGENT" />
+      <option name="cleanBuild" value="true" />
+      <option name="showDependenciesChanges" value="true" />
+    </options>
+    <parameters>
+      <param name="gradle-opts" value="--info" />
+      <param name="gradle-release-opts" value="%gradle-opts% -PbuildRelease=true" />
+      <param name="gradle-release-tasks" value="%gradle-tasks%" />
+      <param name="gradle-tasks" value="clean build properties" />
+      <param name="repo-publish" value="artifactory-bug-snapshots" />
+      <param name="repo-resolve-dev" value="libs-release" />
+    </parameters>
+    <build-runners>
+      <runner id="RUNNER_3" name="build" type="gradle-runner">
+        <parameters>
+          <param name="org.jfrog.artifactory.selectedDeployableServer.activateGradleIntegration" value="true" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.alternativeGradleOptions" value="%gradle-release-opts%" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.alternativeGradleTasks" value="%gradle-release-tasks%" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration" value="GLOBAL" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.deployArtifacts" value="true" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.deployReleaseFlag" value="true" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.deployReleaseText" value="%repo-publish%" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.enableReleaseManagement" value="true" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.envVarsExcludePatterns" value="*password*,*secret*" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.gitReleaseBranchNamePrefix" value="release-" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.includeEnvVars" value="true" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.nextIntegrationProperties" value="verIntegrate,verRelease" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.publishBuildInfo" value="true" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.publishIvyDescriptors" value="true" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.publishMavenDescriptors" value="true" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.releaseProperties" value="verRelease" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.resolveReleaseFlag" value="true" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.resolveReleaseText" value="%repo-resolve%" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.resolvingRepo" value="libs-build-dev" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.targetRepo" value="libs-snapshot-bug" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.urlId" value="0" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.useM2CompatiblePatterns" value="true" />
+          <param name="teamcity.build.workingDir" value="gradle-example-ci-server" />
+          <param name="teamcity.step.mode" value="default" />
+          <param name="ui.gradleRUnner.gradle.build.file" value="build.gradle" />
+          <param name="ui.gradleRunner.additional.gradle.cmd.params" value="%gradle-opts%" />
+          <param name="ui.gradleRunner.gradle.tasks.names" value="%gradle-tasks%" />
+          <param name="ui.gradleRunner.gradle.wrapper.useWrapper" value="true" />
+        </parameters>
+      </runner>
+    </build-runners>
+    <vcs-settings>
+      <vcs-entry-ref root-id="NexstraGithub" />
+    </vcs-settings>
+    <requirements />
+    <build-triggers />
+    <dependencies>
+      <depend-on sourceBuildTypeId="Test_TestBuildnumber">
+        <options>
+          <option name="run-build-if-dependency-failed" value="RUN_ADD_PROBLEM" />
+        </options>
+      </depend-on>
+    </dependencies>
+    <cleanup />
+  </settings>
+</build-type>
+

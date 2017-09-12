@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<build-type xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" uuid="64eff041-66cc-4ade-80dd-4734b87e0ffc" paused="true" xsi:noNamespaceSchemaLocation="http://www.jetbrains.com/teamcity/schemas/10.0/project-config.xsd">
+  <name>test-buildnumber-set</name>
+  <description />
+  <settings>
+    <options>
+      <option name="buildNumberPattern" value="%sharedBuildNumber.id2%" />
+      <option name="checkoutMode" value="ON_SERVER" />
+    </options>
+    <parameters>
+      <param name="currentVersion" value="undefined" />
+      <param name="repo-resolve-dev" value="libs-release" />
+    </parameters>
+    <build-runners>
+      <runner id="RUNNER_4" name="Set build number" type="simpleRunner">
+        <parameters>
+          <param name="org.jfrog.artifactory.selectedDeployableServer.envVarsExcludePatterns" value="*password*,*secret*" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.includeEnvVars" value="true" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.publishBuildInfo" value="true" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.targetRepo" value="artifactory-bug-release" />
+          <param name="org.jfrog.artifactory.selectedDeployableServer.urlId" value="0" />
+          <param name="script.content"><![CDATA[bn="%build.number%"
+echo build.number $bn 
+echo system.artifactory.build.number %system.artifactory.build.number% 
+currentVersion=$(sed 's/currentVersion=//p;d' gradle.properties)
+echo "##teamcity[message text='current version: ${currentVersion} build.number:$bn']"
+echo "##teamcity[setParameter name='currentVersion' value='${currentVersion:-UNKNOWN}']"
+echo "##teamcity[buildNumber '${currentVersion}-${bn}']"]]></param>
+          <param name="teamcity.build.workingDir" value="gradle-example-ci-server2" />
+          <param name="teamcity.step.mode" value="default" />
+          <param name="use.custom.script" value="true" />
+        </parameters>
+      </runner>
+      <runner id="RUNNER_16" name="Print version" type="simpleRunner">
+        <parameters>
+          <param name="script.content"><![CDATA[echo "version is %currentVersion%"
+echo --  "--- gradle.properties --"
+cat gradle.properties
+echo --  "--- environment --"
+env
+echo --  "--- %env.TEAMCITY_BUILD_PROPERTIES_FILE%  --"
+cat "%env.TEAMCITY_BUILD_PROPERTIES_FILE%"]]></param>
+          <param name="teamcity.build.workingDir" value="gradle-example-ci-server2" />
+          <param name="teamcity.step.mode" value="default" />
+          <param name="use.custom.script" value="true" />
+        </parameters>
+      </runner>
+    </build-runners>
+    <vcs-settings>
+      <vcs-entry-ref root-id="NexstraGithub" />
+    </vcs-settings>
+    <requirements />
+    <build-triggers />
+    <cleanup />
+  </settings>
+</build-type>
+
